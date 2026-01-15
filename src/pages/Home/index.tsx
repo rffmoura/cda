@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useGames } from '../../features/games/hooks/useGames';
 import type { Platform } from '../../features/games/types';
 
@@ -29,8 +30,8 @@ const getUniquePlatforms = (platforms: { platform: Platform }[]) => {
 };
 
 export function Home() {
+  const navigate = useNavigate();
   const { data } = useGames();
-  console.log('data', data);
   return (
     <div>
       <div className='w-full flex'>
@@ -53,18 +54,23 @@ export function Home() {
         <div className='border border-neutral-800' />
         <div className='w-[90%] p-10'>
           <div className='grid grid-cols-5 gap-4'>
-            {data?.results.map((game) => {
-              return (
-                <div className='flex flex-col  min-w-50 min-h-60 bg-neutral-700 rounded-xl'>
+            {data?.results.map((game) => (
+              <div key={game.id} className='relative h-72'>
+                <div
+                  onClick={() => navigate(`/game/${game.id}`)}
+                  className='group absolute inset-x-0 top-0 flex flex-col bg-neutral-700 rounded-xl cursor-pointer transition-all duration-300 ease-out hover:scale-105 hover:z-20 hover:shadow-xl hover:shadow-black/50'
+                >
                   <div
-                    className='h-[80%] relative rounded-xl m-1 mb-0 bg-cover bg-center'
+                    className='h-48 relative rounded-t-xl bg-cover bg-center'
                     style={{ backgroundImage: `url(${game.background_image})` }}
                   >
-                    <div className='w-10 m-2 flex rounded-lg justify-center absolute right-0 p-2 bg-lime-600'>
-                      <p>{game.metacritic}</p>
-                    </div>
+                    {game.metacritic && (
+                      <div className='w-10 m-2 flex rounded-lg justify-center absolute right-0 p-2 bg-lime-600'>
+                        <p>{game.metacritic}</p>
+                      </div>
+                    )}
                   </div>
-                  <div className='p-2 flex flex-col justify-between'>
+                  <div className='p-3 flex flex-col gap-2'>
                     <div className='flex gap-2'>
                       {getUniquePlatforms(game.platforms).map((platform) => (
                         <img
@@ -75,11 +81,30 @@ export function Home() {
                         />
                       ))}
                     </div>
-                    <p>{game.name}</p>
+                    <p className='font-semibold truncate group-hover:whitespace-normal'>
+                      {game.name}
+                    </p>
+
+                    {/* Conteúdo expandido no hover */}
+                    <div className='max-h-0 overflow-hidden transition-all duration-300 ease-out group-hover:max-h-40'>
+                      <div className='pt-2 border-t border-neutral-600 space-y-1 text-sm text-neutral-300'>
+                        <p>
+                          <span className='text-neutral-400'>Lançamento:</span> {game.released}
+                        </p>
+                        <p>
+                          <span className='text-neutral-400'>Média de duração:</span>{' '}
+                          {game.playtime} horas
+                        </p>
+                        <p>
+                          <span className='text-neutral-400'>Gêneros:</span>{' '}
+                          {game.genres.map((g) => g.name).join(', ')}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -11,6 +11,7 @@ export const MainLayout = () => {
         {/* <h1 className='text-2xl font-bold text-purple-500'>GDA</h1> */}
         {/* <Logo /> */}
         <img width={80} src={logo} />
+        <input type='text' placeholder='Pesquise por um jogo' />
         <nav className='space-x-4'>
           <a href='/' className='hover:text-purple-400'>
             Home
