@@ -54,13 +54,32 @@ export interface AddedByStatus {
   playing: number;
 }
 
+export interface Developer {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface Publisher {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface PlatformRequirements {
+  minimum?: string;
+  recommended?: string;
+}
+
 export interface Game {
   id: number;
   slug: string;
   name: string;
+  name_original: string;
   released: string;
   tba: boolean;
   background_image: string;
+  background_image_additional?: string;
   rating: number;
   rating_top: number;
   ratings: Rating[];
@@ -78,6 +97,7 @@ export interface Game {
   dominant_color: string;
   platforms: {
     platform: Platform;
+    requirements?: PlatformRequirements;
   }[];
   parent_platforms: {
     platform: Platform;
@@ -88,6 +108,42 @@ export interface Game {
   tags: Tag[];
   esrb_rating: EsrbRating | null;
   short_screenshots: Screenshot[];
+  description?: string;
+  description_raw?: string;
+  developers?: Developer[];
+  publishers?: Publisher[];
+  website?: string;
+}
+
+export interface MetacriticPlatform {
+  metascore: number;
+  url: string;
+  platform: {
+    platform: number;
+    name: string;
+    slug: string;
+  };
+}
+
+// Interface para o endpoint GET /games/{id} que retorna mais campos
+export interface GameDetails extends Game {
+  description: string;
+  description_raw: string;
+  metacritic_platforms: MetacriticPlatform[];
+  metacritic_url: string;
+  screenshots_count: number;
+  movies_count: number;
+  achievements_count: number;
+  parent_achievements_count: number;
+  reddit_url: string;
+  reddit_name: string;
+  reddit_count: number;
+  twitch_count: number;
+  youtube_count: number;
+  alternative_names: string[];
+  developers: Developer[];
+  publishers: Publisher[];
+  game_series_count: number;
 }
 
 export interface FetchGamesResponse {
@@ -95,4 +151,17 @@ export interface FetchGamesResponse {
   next: string | null;
   previous: string | null;
   results: Game[];
+}
+
+export interface GameScreenshot {
+  id: number;
+  image: string;
+  width: number;
+  height: number;
+  is_deleted: boolean;
+}
+
+export interface FetchScreenshotsResponse {
+  count: number;
+  results: GameScreenshot[];
 }
