@@ -44,7 +44,7 @@ export const MainLayout = () => {
               </Button>
             </div>
           ) : (
-            <Button onClick={() => setIsAuthModalOpen(true)} variant='primary' size='lg'>
+            <Button onClick={() => setIsAuthModalOpen(true)} variant='primary' size='md'>
               Sign In
             </Button>
           )}
