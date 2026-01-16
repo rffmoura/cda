@@ -23,12 +23,17 @@ export const MainLayout = () => {
   return (
     <div className='min-h-screen w-full'>
       {/* Header Desktop */}
-      <header className='hidden lg:flex p-4 border-b border-neutral-800 justify-between items-center'>
-        <Link to='/' className='hover:opacity-80 transition'>
+      <header className='hidden lg:flex p-4 border-b border-neutral-800 items-center gap-6'>
+        <Link to='/' className='hover:opacity-80 transition flex-shrink-0'>
           <img width={80} src={logo} alt='Logo' />
         </Link>
-        <SearchInput />
-        <nav className='flex items-center gap-4'>
+
+        {/* Search - expands to fill available space */}
+        <div className='flex-1 flex justify-center'>
+          <SearchInput />
+        </div>
+
+        <nav className='flex items-center gap-4 flex-shrink-0'>
           {user ? (
             <div className='flex items-center gap-3'>
               <div className='w-8 h-8 bg-purple-600 rounded-full flex items-center justify-center text-white font-bold uppercase'>

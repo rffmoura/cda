@@ -11,7 +11,12 @@ interface SidebarProps {
   showSignOut?: boolean;
 }
 
-export function Sidebar({ filters, onFilterChange, onNavigate, showSignOut = false }: SidebarProps) {
+export function Sidebar({
+  filters,
+  onFilterChange,
+  onNavigate,
+  showSignOut = false,
+}: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
 

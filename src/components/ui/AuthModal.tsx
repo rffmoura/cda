@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { Button } from './Button';
+import { Input } from './Input';
+import { CloseIcon } from '../../assets/icons/CloseIcon';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -12,6 +15,16 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState<'magic' | 'signin' | 'signup'>('signin');
   const [message, setMessage] = useState<{ type: 'error' | 'success'; text: string } | null>(null);
+
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setMode('signin');
+      setEmail('');
+      setPassword('');
+      setMessage(null);
+    }
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -32,7 +45,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        onClose(); // Fecha modal ao logar com sucesso
+        onClose();
       }
     } catch (error: unknown) {
       console.error('error', error);
@@ -42,12 +55,43 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
     }
   };
 
+  const handleBack = () => {
+    setMode('signin');
+    setMessage(null);
+  };
+
   return (
     <div className='fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm'>
-      <div className='bg-gray-800 rounded-xl p-6 w-full max-w-md shadow-2xl border border-gray-700 relative'>
-        <button onClick={onClose} className='absolute top-4 right-4 text-gray-400 hover:text-white'>
-          ✕
-        </button>
+      <div className='bg-neutral-800 rounded-xl p-6 w-full max-w-md shadow-2xl border border-neutral-700 relative'>
+        {/* Close button */}
+        <Button onClick={onClose} variant='icon' size='icon' className='absolute top-4 right-4'>
+          <CloseIcon />
+        </Button>
+
+        {/* Back button - shown when not on signin */}
+        {mode !== 'signin' && (
+          <Button
+            onClick={handleBack}
+            variant='icon'
+            size='icon'
+            className='absolute top-4 left-4 '
+          >
+            <svg
+              className='w-5 h-5'
+              fill='none'
+              stroke='currentColor'
+              viewBox='0 0 24 24'
+              xmlns='http://www.w3.org/2000/svg'
+            >
+              <path
+                strokeLinecap='round'
+                strokeLinejoin='round'
+                strokeWidth={2}
+                d='M15 19l-7-7 7-7'
+              />
+            </svg>
+          </Button>
+        )}
 
         <h2 className='text-2xl font-bold text-white mb-6 text-center'>
           {mode === 'magic'
@@ -59,7 +103,11 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
         {message && (
           <div
-            className={`p-3 rounded mb-4 text-sm ${message.type === 'success' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}
+            className={`p-3 rounded-lg mb-4 text-sm ${
+              message.type === 'success'
+                ? 'bg-green-500/20 text-green-400'
+                : 'bg-red-500/20 text-red-400'
+            }`}
           >
             {message.text}
           </div>
@@ -67,11 +115,11 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
         <form onSubmit={handleAuth} className='space-y-4'>
           <div>
-            <label className='block text-gray-400 text-sm mb-1'>Email</label>
-            <input
+            <label className='block text-neutral-400 text-sm mb-1'>Email</label>
+            <Input
               type='email'
               required
-              className='w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:ring-2 focus:ring-purple-500 outline-none'
+              placeholder='seu@email.com'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
@@ -79,21 +127,18 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
 
           {mode !== 'magic' && (
             <div>
-              <label className='block text-gray-400 text-sm mb-1'>Senha</label>
-              <input
+              <label className='block text-neutral-400 text-sm mb-1'>Senha</label>
+              <Input
                 type='password'
                 required
-                className='w-full bg-gray-900 border border-gray-700 rounded p-2 text-white focus:ring-2 focus:ring-purple-500 outline-none'
+                placeholder='********'
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
           )}
 
-          <button
-            disabled={loading}
-            className='w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded transition disabled:opacity-50'
-          >
+          <Button type='submit' disabled={loading} variant='primary' fullWidth>
             {loading
               ? 'Processando...'
               : mode === 'magic'
@@ -101,24 +146,19 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
                 : mode === 'signup'
                   ? 'Cadastrar'
                   : 'Entrar'}
-          </button>
+          </Button>
         </form>
 
-        <div className='mt-6 flex flex-col gap-2 text-sm text-center text-gray-400'>
+        <div className='mt-6 flex flex-col gap-2 text-sm text-center'>
           {mode === 'signin' && (
             <>
-              <button onClick={() => setMode('signup')} className='hover:text-white underline'>
+              <Button variant='link' onClick={() => setMode('signup')}>
                 Não tem conta? Cadastre-se
-              </button>
-              <button onClick={() => setMode('magic')} className='hover:text-purple-400'>
+              </Button>
+              <Button variant='link' onClick={() => setMode('magic')}>
                 Esqueci a senha / Usar Magic Link
-              </button>
+              </Button>
             </>
-          )}
-          {(mode === 'signup' || mode === 'magic') && (
-            <button onClick={() => setMode('signin')} className='hover:text-white underline'>
-              Já tem conta? Entrar
-            </button>
           )}
         </div>
       </div>
