@@ -103,7 +103,11 @@ export const MainLayout = () => {
       </main>
 
       {/* Mobile Sidebar Drawer */}
-      <MobileSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <MobileSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        onSignIn={() => setIsAuthModalOpen(true)}
+      />
 
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />

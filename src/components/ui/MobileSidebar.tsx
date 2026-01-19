@@ -6,9 +6,10 @@ import { useFilters } from '../../context/FilterContext';
 interface MobileSidebarProps {
   isOpen: boolean;
   onClose: () => void;
+  onSignIn: () => void;
 }
 
-export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
+export function MobileSidebar({ isOpen, onClose, onSignIn }: MobileSidebarProps) {
   const { filters, setFilters } = useFilters();
 
   useEffect(() => {
@@ -45,7 +46,13 @@ export function MobileSidebar({ isOpen, onClose }: MobileSidebarProps) {
 
         {/* Sidebar Content */}
         <div className='p-4'>
-          <Sidebar filters={filters} onFilterChange={setFilters} onNavigate={onClose} showSignOut />
+          <Sidebar
+            filters={filters}
+            onFilterChange={setFilters}
+            onNavigate={onClose}
+            onSignIn={onSignIn}
+            isMobile={true}
+          />
         </div>
       </div>
     </div>

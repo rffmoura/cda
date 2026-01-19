@@ -8,14 +8,16 @@ interface SidebarProps {
   filters: GameFilters;
   onFilterChange: (filters: GameFilters) => void;
   onNavigate?: () => void;
-  showSignOut?: boolean;
+  onSignIn?: () => void;
+  isMobile?: boolean;
 }
 
 export function Sidebar({
   filters,
   onFilterChange,
   onNavigate,
-  showSignOut = false,
+  onSignIn,
+  isMobile = false,
 }: SidebarProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
@@ -24,6 +26,12 @@ export function Sidebar({
     signOut();
     onNavigate?.();
   };
+
+  const handleSignInClick = () => {
+    onSignIn?.();
+    onNavigate?.();
+  };
+
   const handleSortChange = (value: SortOption) => {
     onFilterChange({
       ...filters,
@@ -52,27 +60,35 @@ export function Sidebar({
 
   return (
     <aside className='w-full space-y-6'>
+      {!user && isMobile && (
+        <Button onClick={handleSignInClick} variant='primary' fullWidth>
+          Sign In
+        </Button>
+      )}
+
       {/* User */}
-      <div>
-        <h2 className='mb-3 font-bold text-white'>User</h2>
-        <ul className='space-y-1'>
-          {userLinks.map((link) => (
-            <li key={link.to}>
-              <Link
-                to={link.to}
-                onClick={onNavigate}
-                className={`block w-full text-left px-2 py-1.5 rounded transition-colors ${
-                  location.pathname === link.to
-                    ? 'bg-purple-600/20 text-purple-400 font-medium'
-                    : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
-                }`}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
+      {user && (
+        <div>
+          <h2 className='mb-3 font-bold text-white'>User</h2>
+          <ul className='space-y-1'>
+            {userLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  onClick={onNavigate}
+                  className={`block w-full text-left px-2 py-1.5 rounded transition-colors ${
+                    location.pathname === link.to
+                      ? 'bg-purple-600/20 text-purple-400 font-medium'
+                      : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Sort By */}
       <div>
@@ -147,8 +163,8 @@ export function Sidebar({
         </button>
       )}
 
-      {/* Sign Out - mobile only */}
-      {showSignOut && user && (
+      {/* Sign Out */}
+      {user && (
         <div className='pt-4 border-t border-neutral-800'>
           <Button onClick={handleSignOut} variant='danger' fullWidth>
             Sair
