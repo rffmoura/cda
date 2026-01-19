@@ -10,6 +10,7 @@ import { formatRequirements } from '../../utils/formatRequirements';
 import { cleanDescription } from '../../utils/cleanDescription';
 import { ArrowDownIcon } from '../../assets/icons/ArrowDownIcon';
 import { ArrowUpIcon } from '../../assets/icons/ArrowUpIcon';
+import { storeStyles } from '../../utils/storeSyles';
 
 export function GameDetails() {
   const { id } = useParams();
@@ -102,7 +103,11 @@ export function GameDetails() {
             </div>
           </div>
 
-          <LibraryButton game={game} className='hidden md:block' />
+          <LibraryButton
+            game={game}
+            className='hidden md:block'
+            onLoggedOutClick={() => setIsAuthModalOpen(true)}
+          />
         </div>
       </div>
 
@@ -311,36 +316,45 @@ export function GameDetails() {
           )}
 
           {game.stores && game.stores.length > 0 && (
-            <div>
-              <h3 className='text-gray-400 font-bold mb-3 uppercase text-sm'>Where to Buy</h3>
+            <div className='animate-in fade-in slide-in-from-bottom-4 duration-700'>
+              <h3 className='text-gray-400 font-bold mb-3 uppercase text-sm flex items-center gap-2'>
+                Where to Buy
+              </h3>
               <div className='grid grid-cols-1 gap-2'>
-                {game.stores.map((s) => (
-                  <a
-                    key={s.id}
-                    href={`https://${s.store.domain}`}
-                    target='_blank'
-                    rel='noreferrer'
-                    className='flex items-center justify-between px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition group'
-                  >
-                    <span className='font-medium text-gray-300 group-hover:text-white'>
-                      {s.store.name}
-                    </span>
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      stroke='currentColor'
-                      strokeWidth='2'
-                      className='text-gray-600 group-hover:text-white'
+                {game.stores.map((s) => {
+                  const specificStyle =
+                    storeStyles[s.store.name] || 'hover:bg-gray-700 hover:border-gray-500';
+
+                  return (
+                    <a
+                      key={s.id}
+                      href={`https://${s.store.domain}`}
+                      target='_blank'
+                      rel='noreferrer'
+                      className={`flex items-center justify-between px-4 py-3 bg-gray-800 border border-transparent rounded-lg transition-all duration-300 group ${specificStyle}`}
                     >
-                      <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'></path>
-                      <polyline points='15 3 21 3 21 9'></polyline>
-                      <line x1='10' y1='14' x2='21' y2='3'></line>
-                    </svg>
-                  </a>
-                ))}
+                      <span className='font-medium text-gray-300 group-hover:text-current transition-colors flex items-center gap-2'>
+                        {s.store.name}
+                      </span>
+
+                      <span className='text-gray-600 group-hover:text-current opacity-0 group-hover:opacity-100 transition-all -translate-x-2 group-hover:translate-x-0'>
+                        <svg
+                          xmlns='http://www.w3.org/2000/svg'
+                          width='16'
+                          height='16'
+                          viewBox='0 0 24 24'
+                          fill='none'
+                          stroke='currentColor'
+                          strokeWidth='2'
+                        >
+                          <path d='M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6'></path>
+                          <polyline points='15 3 21 3 21 9'></polyline>
+                          <line x1='10' y1='14' x2='21' y2='3'></line>
+                        </svg>
+                      </span>
+                    </a>
+                  );
+                })}
               </div>
             </div>
           )}
