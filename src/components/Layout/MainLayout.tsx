@@ -1,5 +1,5 @@
 // src/components/Layout/MainLayout.tsx
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import { SearchInput } from '../ui/SearchInput';
 import { useAuth } from '../../context/AuthContext';
@@ -10,10 +10,12 @@ import { MenuIcon } from '../../assets/icons/MenuIcon';
 import { SearchIcon } from '../../assets/icons/SearchIcon';
 import { CloseIcon } from '../../assets/icons/CloseIcon';
 import { MobileSidebar } from '../ui/MobileSidebar';
+import { BackIcon } from '../../assets/icons/BackIcon';
 
 export const MainLayout = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
@@ -69,17 +71,23 @@ export const MainLayout = () => {
         ) : (
           // Normal mode
           <>
-            {/* Hamburger - only on home page */}
-            {isHomePage ? (
-              <button
-                onClick={() => setIsSidebarOpen(true)}
-                className='p-2 text-neutral-400 hover:text-white'
-              >
-                <MenuIcon />
-              </button>
-            ) : (
-              <div className='w-10' />
-            )}
+            <div className='w-10'>
+              {isHomePage ? (
+                <button
+                  onClick={() => setIsSidebarOpen(true)}
+                  className='p-2 text-neutral-400 hover:text-white'
+                >
+                  <MenuIcon />
+                </button>
+              ) : (
+                <button
+                  onClick={() => navigate(-1)}
+                  className='p-2 text-neutral-400 hover:text-white'
+                >
+                  <BackIcon />
+                </button>
+              )}
+            </div>
 
             {/* Centered Logo */}
             <Link to='/' className='flex-1 flex justify-center hover:opacity-80 transition'>

@@ -1,197 +1,22 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useGameById } from '../../features/games/hooks/useGameById';
 import { useGameScreenshots } from '../../features/games/hooks/useGameScreenshots';
 import { getUniquePlatforms } from '../../utils/getUniquePlatforms';
 import { Button } from '../../components/ui/Button';
-import { PlusIcon } from '../../assets/icons/PlusIcon';
-import { useAuth } from '../../context/AuthContext';
-import { useLibrary } from '../../features/library/hooks/useLibrary';
-import type { LibraryGame } from '../../features/library/api';
-import type { Game } from '../../features/games/types';
+import { AuthModal } from '../../components/ui/AuthModal';
+import { LibraryButton } from '../../components/ui/LibraryButton';
+import { formatRequirements } from '../../utils/formatRequirements';
+import { cleanDescription } from '../../utils/cleanDescription';
+import { ArrowDownIcon } from '../../assets/icons/ArrowDownIcon';
+import { ArrowUpIcon } from '../../assets/icons/ArrowUpIcon';
 
-// --- Helper 1: Formatar Requisitos (Já existia) ---
-const formatRequirements = (requirements: string) => {
-  if (!requirements) return null;
-  let cleaned = requirements.replace(/Additional Notes:?.*$/i, '');
-  cleaned = cleaned.replace(/^(Minimum:|Recommended:)\s*/i, '');
-  const keys = ['OS', 'Processor', 'Memory', 'Graphics', 'Storage', 'Sound Card', 'DirectX'];
-  keys.forEach((key) => {
-    const regex = new RegExp(`(${key}):`, 'g');
-    cleaned = cleaned.replace(regex, `<br/><strong class="text-purple-400">$1:</strong>`);
-  });
-  return cleaned;
-};
-
-// --- Helper 2: Remover Espanhol/Outras línguas (NOVO) ---
-const cleanDescription = (html: string) => {
-  if (!html) return '';
-
-  // Lista de palavras que geralmente indicam o início de outra língua na RAWG
-  const stopMarkers = [
-    '<p>Español',
-    '<p>En Español',
-    'Español:',
-    '<strong>Español',
-    '<p>Deutsch',
-    '<p>Français',
-    '<p>Italiano',
-    '<p>Pусский',
-    '<h1>Español',
-  ];
-
-  let cutIndex = html.length;
-
-  // Procura onde começa o primeiro marcador de língua estrangeira
-  stopMarkers.forEach((marker) => {
-    const index = html.indexOf(marker);
-    if (index !== -1 && index < cutIndex) {
-      cutIndex = index;
-    }
-  });
-
-  // Retorna apenas o texto do início até antes do marcador
-  return html.substring(0, cutIndex);
-};
-
-// --- Sub-componente LibraryButton (Igual) ---
-const LibraryButton = ({ game, className = '' }: { game: Game; className?: string }) => {
-  const { user } = useAuth();
-  const { games, addGame, removeGame, isAdding } = useLibrary();
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const savedGame = games.find((g) => g.game_id === game.id);
-
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleAction = (status: LibraryGame['status']) => {
-    addGame({
-      id: game.id,
-      name: game.name,
-      image: game.background_image,
-      status: status,
-    });
-    setIsOpen(false);
-  };
-
-  const statusOptions: { label: string; value: LibraryGame['status']; color: string }[] = [
-    { label: 'Playing', value: 'playing', color: 'bg-green-500' },
-    { label: 'Backlog', value: 'backlog', color: 'bg-gray-500' },
-    { label: 'Wishlist', value: 'wishlist', color: 'bg-blue-500' },
-    { label: 'Completed', value: 'completed', color: 'bg-yellow-500' },
-  ];
-
-  if (!user) {
-    return (
-      <div className={className}>
-        <Button
-          variant='secondary'
-          onClick={() => alert('Por favor, faça login no topo da página para salvar jogos.')}
-        >
-          <PlusIcon />
-          Login to Add
-        </Button>
-      </div>
-    );
-  }
-
-  return (
-    <div className={`relative ${className}`} ref={dropdownRef}>
-      <Button
-        variant={savedGame ? 'primary' : 'secondary'}
-        className={
-          savedGame ? 'bg-purple-600 hover:bg-purple-700 text-white border-transparent' : ''
-        }
-        onClick={() => setIsOpen(!isOpen)}
-        disabled={isAdding}
-      >
-        {isAdding ? (
-          <span className='animate-pulse'>Saving...</span>
-        ) : savedGame ? (
-          <>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='20'
-              height='20'
-              viewBox='0 0 24 24'
-              fill='none'
-              stroke='currentColor'
-              strokeWidth='2'
-              strokeLinecap='round'
-              strokeLinejoin='round'
-            >
-              <polyline points='20 6 9 17 4 12'></polyline>
-            </svg>
-            <span className='capitalize'>{savedGame.status}</span>
-          </>
-        ) : (
-          <>
-            <PlusIcon />
-            Add to Library
-          </>
-        )}
-      </Button>
-
-      {isOpen && (
-        <div className='absolute top-full mt-2 w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 right-0 md:left-0 md:right-auto'>
-          <div className='p-1'>
-            {statusOptions.map((option) => (
-              <button
-                key={option.value}
-                onClick={() => handleAction(option.value)}
-                className={`w-full text-left px-4 py-2.5 text-sm text-gray-200 hover:bg-gray-700 rounded-lg flex items-center gap-3 transition-colors ${savedGame?.status === option.value ? 'bg-gray-700 font-bold text-white' : ''}`}
-              >
-                <span className={`w-2 h-2 rounded-full ${option.color}`} />
-                {option.label}
-              </button>
-            ))}
-          </div>
-          {savedGame && (
-            <div className='border-t border-gray-700 p-1'>
-              <button
-                onClick={() => {
-                  removeGame(game.id);
-                  setIsOpen(false);
-                }}
-                className='w-full text-left px-4 py-2.5 text-sm text-red-400 hover:bg-red-500/10 rounded-lg flex items-center gap-2 transition-colors'
-              >
-                <svg
-                  xmlns='http://www.w3.org/2000/svg'
-                  width='16'
-                  height='16'
-                  viewBox='0 0 24 24'
-                  fill='none'
-                  stroke='currentColor'
-                  strokeWidth='2'
-                >
-                  <path d='M3 6h18'></path>
-                  <path d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'></path>
-                  <path d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'></path>
-                </svg>
-                Remove from Library
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// --- Componente Principal ---
 export function GameDetails() {
   const { id } = useParams();
   const gameId = Number(id);
   const [currentScreenshot, setCurrentScreenshot] = useState(0);
   const [isDescExpanded, setIsDescExpanded] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   const { data: game, isLoading: isLoadingGame } = useGameById(gameId);
   const { data: screenshotsData, isLoading: isLoadingScreenshots } = useGameScreenshots(gameId);
@@ -307,33 +132,11 @@ export function GameDetails() {
               >
                 {isDescExpanded ? (
                   <>
-                    Show Less{' '}
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      stroke='currentColor'
-                      strokeWidth='2'
-                    >
-                      <path d='M18 15l-6-6-6 6' />
-                    </svg>
+                    Show Less <ArrowUpIcon />
                   </>
                 ) : (
                   <>
-                    Read More{' '}
-                    <svg
-                      xmlns='http://www.w3.org/2000/svg'
-                      width='16'
-                      height='16'
-                      viewBox='0 0 24 24'
-                      fill='none'
-                      stroke='currentColor'
-                      strokeWidth='2'
-                    >
-                      <path d='M6 9l6 6 6-6' />
-                    </svg>
+                    Read More <ArrowDownIcon />
                   </>
                 )}
               </button>
@@ -545,8 +348,13 @@ export function GameDetails() {
       </div>
 
       <div className='md:hidden fixed bottom-0 left-0 right-0 p-4 bg-gray-900/90 backdrop-blur border-t border-gray-800 z-50'>
-        <LibraryButton game={game} className='w-full' />
+        <LibraryButton
+          game={game}
+          className='w-full'
+          onLoggedOutClick={() => setIsAuthModalOpen(true)}
+        />
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   );
 }
