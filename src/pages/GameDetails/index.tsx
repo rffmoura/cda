@@ -259,7 +259,7 @@ export function GameDetails() {
         </div>
 
         {/* Right Column (Sidebar) */}
-        <div className='space-y-8'>
+        <div className='space-y-8 md:mt-14'>
           <div className='bg-gray-800/50 rounded-xl p-6 border border-gray-700/50 grid grid-cols-2 gap-6'>
             <div>
               <p className='text-gray-500 text-xs uppercase font-bold mb-1'>Rating</p>
