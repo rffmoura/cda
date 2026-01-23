@@ -8,7 +8,7 @@ export interface LibraryGame {
   game_image: string;
 }
 
-// Adicionar jogo
+// Adicionar ou atualizar jogo na biblioteca
 export const addToLibrary = async (
   gameId: number,
   name: string,
@@ -22,13 +22,18 @@ export const addToLibrary = async (
 
   const { data, error } = await supabase
     .from('user_games')
-    .insert({
-      user_id: user.id,
-      game_id: gameId,
-      game_name: name,
-      game_image: image,
-      status: status,
-    })
+    .upsert(
+      {
+        user_id: user.id,
+        game_id: gameId,
+        game_name: name,
+        game_image: image,
+        status: status,
+      },
+      {
+        onConflict: 'user_id,game_id',
+      },
+    )
     .select()
     .single();
 

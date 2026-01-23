@@ -16,7 +16,7 @@ export const LibraryButton = ({
   onLoggedOutClick?: () => void;
 }) => {
   const { user } = useAuth();
-  const { games, addGame, removeGame, isAdding } = useLibrary();
+  const { games, addGame, removeGame } = useLibrary();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const savedGame = games.find((g) => g.game_id === game.id);
@@ -67,11 +67,8 @@ export const LibraryButton = ({
           savedGame ? 'bg-purple-600 hover:bg-purple-700 text-white border-transparent' : ''
         }
         onClick={() => setIsOpen(!isOpen)}
-        disabled={isAdding}
       >
-        {isAdding ? (
-          <span className='animate-pulse'>Saving...</span>
-        ) : savedGame ? (
+        {savedGame ? (
           <>
             <svg
               xmlns='http://www.w3.org/2000/svg'
