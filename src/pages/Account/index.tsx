@@ -184,7 +184,7 @@ export function Account() {
           <div>
             <label className='block text-neutral-400 text-sm mb-1'>Nova Senha</label>
             <Input
-              type='password'
+              isPassword
               placeholder='Mínimo 6 caracteres'
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -194,7 +194,7 @@ export function Account() {
           <div>
             <label className='block text-neutral-400 text-sm mb-1'>Confirmar Senha</label>
             <Input
-              type='password'
+              isPassword
               placeholder='Repita a senha'
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

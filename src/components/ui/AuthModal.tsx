@@ -94,11 +94,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
         )}
 
         <h2 className='text-2xl font-bold text-white mb-6 text-center'>
-          {mode === 'magic'
-            ? 'Magic Link'
-            : mode === 'signup'
-              ? 'Crie sua conta'
-              : 'Bem-vindo de volta'}
+          {mode === 'magic' ? 'Magic Link' : mode === 'signup' ? 'Crie sua conta' : 'Bem-vindo(a)!'}
         </h2>
 
         {message && (
@@ -129,7 +125,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <div>
               <label className='block text-neutral-400 text-sm mb-1'>Senha</label>
               <Input
-                type='password'
+                isPassword
                 required
                 placeholder='********'
                 value={password}
