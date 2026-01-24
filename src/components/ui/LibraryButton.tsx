@@ -94,7 +94,7 @@ export const LibraryButton = ({
       </Button>
 
       {isOpen && (
-        <div className='absolute top-full mt-2 w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100 right-0 md:left-0 md:right-auto'>
+        <div className='absolute bottom-full mb-2 md:bottom-auto md:top-full md:mt-2 md:mb-0 left-0 right-0 md:right-auto md:w-48 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-100'>
           <div className='p-1'>
             {statusOptions.map((option) => (
               <button
